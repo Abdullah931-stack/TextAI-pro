@@ -15,7 +15,7 @@ import {
     deleteFileOrFolder,
     renameItem
 } from './fileSystem.js';
-import { openNameModal } from './modals.js';
+import { openNameModal, openDeleteModal } from './modals.js';
 import { showSuccess, showError, showInfo } from './toast.js';
 import { importFile, validateFile } from '../services/fileService.js';
 
@@ -193,11 +193,11 @@ function handleTreeClick(e) {
  * Handle delete item
  */
 async function handleDeleteItem(id, type) {
-    const confirmMsg = type === 'folder'
-        ? 'هل أنت متأكد من حذف هذا المجلد وجميع محتوياته؟'
-        : 'هل أنت متأكد من حذف هذا الملف؟';
+    const file = await getFile(id);
+    if (!file) return;
 
-    if (confirm(confirmMsg)) {
+    const confirmed = await openDeleteModal(file.name, type);
+    if (confirmed) {
         try {
             await deleteFileOrFolder(id);
             showSuccess('تم الحذف بنجاح');

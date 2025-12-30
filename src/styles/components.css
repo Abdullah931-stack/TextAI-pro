@@ -322,6 +322,46 @@
     border-color: var(--accent-muted);
 }
 
+/* Delete Modal */
+.delete-modal-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-4);
+    background: rgba(159, 74, 74, 0.15);
+    border-radius: 50%;
+    color: var(--error);
+    font-size: 28px;
+    animation: pulseWarning 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarning {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.delete-item-name {
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+    text-align: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-2);
+    word-break: break-word;
+    direction: auto;
+}
+
+.confirm-modal .modal-content {
+    text-align: center;
+}
+
+.confirm-modal .modal-actions {
+    justify-content: center;
+}
+
 /* ======= Toast ======= */
 .toast-container {
     position: fixed;

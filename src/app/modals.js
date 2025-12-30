@@ -53,6 +53,7 @@ export function initModals() {
     setupSearchModal();
     setupExportModal();
     setupNameModal();
+    setupDeleteModal();
 }
 
 /**
@@ -276,6 +277,62 @@ export function openNameModal(title, callback, initialValue = '') {
     document.getElementById('item-name-input').value = initialValue;
     nameModalCallback = callback;
     openModal('name-modal');
+}
+
+/**
+ * Delete modal state
+ */
+let deleteModalResolve = null;
+
+function setupDeleteModal() {
+    const cancelBtn = document.getElementById('cancel-delete');
+    const confirmBtn = document.getElementById('confirm-delete');
+
+    cancelBtn?.addEventListener('click', () => {
+        if (deleteModalResolve) {
+            deleteModalResolve(false);
+            deleteModalResolve = null;
+        }
+        closeModal();
+    });
+
+    confirmBtn?.addEventListener('click', () => {
+        if (deleteModalResolve) {
+            deleteModalResolve(true);
+            deleteModalResolve = null;
+        }
+        closeModal();
+    });
+
+    // Handle ESC key and overlay click for delete modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && deleteModalResolve) {
+            deleteModalResolve(false);
+            deleteModalResolve = null;
+        }
+    });
+}
+
+/**
+ * Open delete confirmation modal
+ * @param {string} itemName - Name of the item to delete
+ * @param {string} itemType - 'file' or 'folder'
+ * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
+ */
+export function openDeleteModal(itemName, itemType) {
+    return new Promise((resolve) => {
+        const message = document.getElementById('delete-modal-message');
+        const nameDisplay = document.getElementById('delete-item-name');
+
+        message.textContent = itemType === 'folder'
+            ? 'هل أنت متأكد من حذف هذا المجلد وجميع محتوياته؟'
+            : 'هل أنت متأكد من حذف هذا الملف؟';
+
+        nameDisplay.textContent = itemName;
+        deleteModalResolve = resolve;
+
+        openModal('delete-modal');
+    });
 }
 
 // Utility functions
