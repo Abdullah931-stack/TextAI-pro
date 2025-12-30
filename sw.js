@@ -3,7 +3,7 @@
 // ============================================
 // Provides offline functionality and caching
 
-const CACHE_NAME = 'textaipro-v1';
+const CACHE_NAME = "textai-pro-v2";
 const STATIC_CACHE = 'textaipro-static-v1';
 const DYNAMIC_CACHE = 'textaipro-dynamic-v1';
 
