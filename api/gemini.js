@@ -305,37 +305,29 @@ async function safeRotation(redis, oldIndex) {
 
 /**
  * Main handler - Full SOP implementation
- * @param {Request} request - Incoming request
- * @returns {Response} API response
+ * @param {import('@vercel/node').VercelRequest} req - Incoming request
+ * @param {import('@vercel/node').VercelResponse} res - Outgoing response
  */
-export default async function handler(request) {
-    // CORS headers
-    const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
+export default async function handler(req, res) {
+    // CORS headers - Set at the beginning
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Handle preflight
-    if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: corsHeaders });
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end();
     }
 
-    if (request.method !== 'POST') {
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-            status: 405,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        const { text, action } = await request.json();
+        const { text, action } = req.body;
 
         if (!text || !action) {
-            return new Response(JSON.stringify({ error: 'Missing text or action' }), {
-                status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            });
+            return res.status(400).json({ error: 'Missing text or action' });
         }
 
         const redis = getRedisClient();
@@ -372,20 +364,14 @@ export default async function handler(request) {
 
                 // If still failing, return error to user
                 if (!result.success) {
-                    return new Response(JSON.stringify({
+                    return res.status(result.status || 500).json({
                         error: result.error || 'All keys exhausted or rate-limited',
                         retried: true
-                    }), {
-                        status: result.status || 500,
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
                     });
                 }
             } else {
                 // Other errors (4xx, 5xx) - don't increment counter
-                return new Response(JSON.stringify({ error: result.error }), {
-                    status: result.status || 500,
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-                });
+                return res.status(result.status || 500).json({ error: result.error });
             }
         }
 
@@ -400,20 +386,14 @@ export default async function handler(request) {
         }
 
         // Return success response
-        return new Response(JSON.stringify({
+        return res.status(200).json({
             result: result.data,
             keyIndex: safeIndex,
             requestCount: count
-        }), {
-            status: 200,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
 
     } catch (error) {
         console.error('[GeminiProxy] Error:', error);
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+        return res.status(500).json({ error: error.message });
     }
 }
