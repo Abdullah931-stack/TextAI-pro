@@ -4,7 +4,6 @@
     "description": "محرر نصوص احترافي مدعوم بالذكاء الاصطناعي Gemini للكتّاب المحترفين",
     "start_url": "/",
     "display": "standalone",
-    "orientation": "portrait",
     "theme_color": "#1a1a2e",
     "background_color": "#0f0f1a",
     "lang": "ar",
