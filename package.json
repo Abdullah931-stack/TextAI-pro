@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vercel dev",
     "local": "node server.js",
-    "build": "echo 'Static site - no build step required'",
+    "build": "mkdir -p public && cp -r src icons index.html manifest.json sw.js icon.png public/",
     "start": "vercel dev"
   },
   "dependencies": {
