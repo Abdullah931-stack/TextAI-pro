@@ -1,0 +1,44 @@
+{
+    "name": "TextAIpro - AI-Powered Text Editor",
+    "short_name": "TextAIpro",
+    "description": "محرر نصوص احترافي مدعوم بالذكاء الاصطناعي Gemini للكتّاب المحترفين",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "theme_color": "#1a1a2e",
+    "background_color": "#0f0f1a",
+    "lang": "ar",
+    "dir": "rtl",
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "utilities"
+    ],
+    "screenshots": [],
+    "prefer_related_applications": false
+}

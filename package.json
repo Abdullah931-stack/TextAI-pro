@@ -1,0 +1,22 @@
+{
+  "name": "textaipro",
+  "version": "1.0.0",
+  "description": "TextAIpro - Luxury AI-Powered Text Editor with Gemini integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "local": "node server.js",
+    "build": "echo 'Static site - no build step required'",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.28.0",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

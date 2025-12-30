@@ -1,0 +1,38 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "index.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "src/**/*",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "icon.png",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
+        }
+    ],
+    "env": {
+        "API_KEYS_POOL": "@api_keys_pool",
+        "UPSTASH_REDIS_REST_URL": "@upstash_redis_rest_url",
+        "UPSTASH_REDIS_REST_TOKEN": "@upstash_redis_rest_token",
+        "GEMINI_MODEL": "gemini-3-flash-preview",
+        "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/models"
+    }
+}

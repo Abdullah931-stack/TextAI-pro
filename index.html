@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="TextAIpro - Luxury AI-Powered Text Editor with Gemini 2.5 Flash integration for professional writers">
+    <title>TextAIpro | AI-Powered Text Editor</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TextAIpro">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Google Fonts - Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Sharp -->
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.7.2/css/all.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.7.2/css/sharp-solid.css">
+
+    <!-- PDF.js for PDF import -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="src/styles/index.css">
+    <link rel="stylesheet" href="src/styles/layout.css">
+    <link rel="stylesheet" href="src/styles/components.css">
+    <link rel="stylesheet" href="src/styles/animations.css">
+    <link rel="stylesheet" href="src/styles/mobile.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar - File Explorer -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">TextAI<span class="accent">pro</span></h1>
+                <button id="toggle-sidebar" class="icon-btn" title="طي الشريط الجانبي">
+                    <span class="icon-chevron"></span>
+                </button>
+            </div>
+
+            <div class="sidebar-actions">
+                <button id="new-file-btn" class="action-btn">
+                    <!-- USER: INSERT FILE ICON HERE -->
+                    <span class="icon-file-plus"></span>
+                    <span>ملف جديد</span>
+                </button>
+                <button id="new-folder-btn" class="action-btn">
+                    <!-- USER: INSERT FOLDER ICON HERE -->
+                    <span class="icon-folder-plus"></span>
+                    <span>مجلد جديد</span>
+                </button>
+            </div>
+
+            <div id="file-tree" class="file-tree" data-drop-zone="internal">
+                <!-- File tree will be rendered by JavaScript -->
+            </div>
+
+            <div id="drop-zone" class="drop-zone">
+                <input type="file" id="file-input" class="file-input-hidden"
+                    accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf" multiple>
+                <span class="icon-upload"></span>
+                <p>اسحب ملفات هنا للاستيراد</p>
+                <small>أو اضغط للاختيار • .txt, .md, .pdf</small>
+            </div>
+        </aside>
+
+        <!-- Floating button to expand collapsed sidebar (desktop only) -->
+        <button id="expand-sidebar-btn" class="expand-sidebar-btn" title="فتح الشريط الجانبي">
+            <span class="icon-chevron-expand"></span>
+        </button>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Toolbar -->
+            <header id="toolbar" class="toolbar glass">
+                <!-- Mobile Hamburger Menu -->
+                <button id="hamburger-btn" class="hamburger-btn" title="القائمة" aria-label="فتح القائمة الجانبية">
+                    <span class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+
+                <!-- Mobile Status Info (shown on mobile, hidden on desktop) -->
+                <div class="mobile-status-info">
+                    <span id="mobile-current-file" class="mobile-file-name">مستند جديد</span>
+                    <span id="mobile-word-count" class="mobile-word-count">0 كلمة</span>
+                </div>
+
+                <div class="toolbar-group editing-tools">
+                    <button id="undo-btn" class="tool-btn mobile-hide" title="تراجع (Ctrl+Z)">
+                        <span class="icon-undo"></span>
+                    </button>
+                    <button id="redo-btn" class="tool-btn mobile-hide" title="تقدم (Ctrl+Y)">
+                        <span class="icon-redo"></span>
+                    </button>
+                    <div class="divider mobile-hide"></div>
+                    <button id="search-btn" class="tool-btn mobile-hide" title="بحث واستبدال (Ctrl+F)">
+                        <span class="icon-search"></span>
+                    </button>
+                    <button id="copy-btn" class="tool-btn mobile-hide" title="نسخ (Ctrl+C)">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                    <button id="clear-btn" class="tool-btn destructive mobile-hide" title="مسح الكل">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    <div class="divider mobile-hide"></div>
+                    <button id="export-btn" class="tool-btn mobile-hide" title="تصدير">
+                        <i class="fa-duotone fa-regular fa-file-arrow-down"></i>
+                    </button>
+                </div>
+
+                <div class="toolbar-group ai-tools">
+                    <button id="correct-btn" class="tool-btn ai-btn" title="تصحيح نحوي وإملائي">
+                        <span class="icon-check"></span>
+                        <span class="btn-label">تصحيح</span>
+                    </button>
+                    <button id="improve-btn" class="tool-btn ai-btn" title="تحسين الأسلوب">
+                        <span class="icon-sparkle"></span>
+                        <span class="btn-label">تطوير</span>
+                    </button>
+                    <button id="summarize-btn" class="tool-btn ai-btn" title="تلخيص النص">
+                        <span class="icon-compress"></span>
+                        <span class="btn-label">تلخيص</span>
+                    </button>
+                    <button id="tomd-btn" class="tool-btn ai-btn" title="تحويل النص إلى موجه">
+                        <i class="fa-sharp fa-solid fa-message-bot"></i>
+                        <span class="btn-label">موجه</span>
+                    </button>
+                    <button id="translate-btn" class="tool-btn ai-btn" title="ترجمة (عربي ↔ إنجليزي)">
+                        <span class="icon-translate"></span>
+                        <span class="btn-label">ترجمة</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-group view-tools">
+                    <button id="line-numbers-btn" class="tool-btn" title="أرقام الأسطر">
+                        <span class="icon-list-ordered"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Editor Canvas -->
+            <div id="editor-container" class="editor-container">
+                <div id="line-numbers" class="line-numbers" hidden>
+                    <span>1</span>
+                </div>
+                <textarea id="editor" class="editor" spellcheck="true" placeholder="ابدأ الكتابة هنا..."
+                    dir="auto"></textarea>
+
+                <!-- Skeleton Loader for AI Processing -->
+                <div id="skeleton-loader" class="skeleton-loader" hidden>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+            </div>
+
+            <!-- Current File Indicator -->
+            <footer class="status-bar glass">
+                <span id="current-file">مستند جديد</span>
+                <span id="word-count">0 كلمة</span>
+                <span id="save-status">محفوظ</span>
+            </footer>
+        </main>
+
+        <!-- Mobile Bottom Navigation Bar -->
+        <nav id="mobile-bottom-bar" class="mobile-bottom-bar">
+            <button class="bottom-bar-btn" data-trigger="undo-btn" title="تراجع">
+                <span class="icon-undo"></span>
+            </button>
+            <button class="bottom-bar-btn" data-trigger="redo-btn" title="تقدم">
+                <span class="icon-redo"></span>
+            </button>
+            <button id="ai-fab" class="ai-center-btn" title="أدوات الذكاء الاصطناعي">
+                <span class="icon-ai-refined"></span>
+            </button>
+            <button class="bottom-bar-btn" data-trigger="search-btn" title="بحث">
+                <span class="icon-search"></span>
+            </button>
+            <button class="bottom-bar-btn" id="mobile-more-btn" title="المزيد">
+                <span class="icon-more"></span>
+            </button>
+        </nav>
+
+        <!-- AI Bottom Sheet -->
+        <div id="ai-bottom-sheet" class="ai-bottom-sheet">
+            <div class="ai-sheet-header">
+                <h3>أدوات الذكاء الاصطناعي</h3>
+                <button id="close-ai-sheet" class="icon-btn">
+                    <span class="icon-close"></span>
+                </button>
+            </div>
+            <div class="ai-sheet-content">
+                <button data-trigger="correct-btn" class="ai-sheet-btn">
+                    <span class="icon-check"></span>
+                    <span>تصحيح نحوي وإملائي</span>
+                </button>
+                <button data-trigger="improve-btn" class="ai-sheet-btn">
+                    <span class="icon-sparkle"></span>
+                    <span>تحسين الأسلوب</span>
+                </button>
+                <button data-trigger="summarize-btn" class="ai-sheet-btn">
+                    <span class="icon-compress"></span>
+                    <span>تلخيص النص</span>
+                </button>
+                <button data-trigger="tomd-btn" class="ai-sheet-btn">
+                    <i class="fa-sharp fa-solid fa-message-bot"></i>
+                    <span>تحويل النص إلى موجه</span>
+                </button>
+                <button data-trigger="translate-btn" class="ai-sheet-btn">
+                    <span class="icon-translate"></span>
+                    <span>ترجمة (عربي ↔ إنجليزي)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- More Options Bottom Sheet -->
+        <div id="more-options-sheet" class="ai-bottom-sheet">
+            <div class="ai-sheet-header">
+                <h3>خيارات إضافية</h3>
+                <button id="close-more-sheet" class="icon-btn">
+                    <span class="icon-close"></span>
+                </button>
+            </div>
+            <div class="ai-sheet-content">
+                <button data-trigger="copy-btn" class="ai-sheet-btn">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>نسخ النص</span>
+                </button>
+                <button data-trigger="clear-btn" class="ai-sheet-btn destructive-option">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>مسح الكل</span>
+                </button>
+                <button data-trigger="export-btn" class="ai-sheet-btn">
+                    <i class="fa-duotone fa-regular fa-file-arrow-down"></i>
+                    <span>تصدير الملف</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" hidden>
+        <!-- Confirm Clear Modal -->
+        <div id="confirm-modal" class="modal confirm-modal" hidden>
+            <div class="modal-content">
+                <h2>تأكيد المسح</h2>
+                <p>هل أنت متأكد من مسح كل المحتوى؟ لا يمكن التراجع عن هذا الإجراء.</p>
+                <div class="modal-actions">
+                    <button id="cancel-clear" class="btn secondary">إلغاء</button>
+                    <button id="confirm-clear" class="btn destructive">مسح</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Replace Modal -->
+        <div id="search-modal" class="modal search-modal" hidden>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>بحث واستبدال</h2>
+                    <button id="close-search" class="icon-btn">
+                        <span class="icon-close"></span>
+                    </button>
+                </div>
+                <div class="search-inputs">
+                    <div class="input-group">
+                        <label for="search-input">بحث عن:</label>
+                        <input type="text" id="search-input" class="text-input" placeholder="أدخل النص للبحث...">
+                    </div>
+                    <div class="input-group">
+                        <label for="replace-input">استبدال بـ:</label>
+                        <input type="text" id="replace-input" class="text-input" placeholder="النص البديل...">
+                    </div>
+                </div>
+                <div id="search-results" class="search-results">
+                    <!-- Results will be rendered here -->
+                </div>
+                <div class="search-actions">
+                    <span id="match-count">0 نتيجة</span>
+                    <button id="replace-selected" class="btn secondary" disabled>استبدال المحدد</button>
+                    <button id="replace-all" class="btn primary" disabled>استبدال الكل</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Modal -->
+        <div id="export-modal" class="modal export-modal" hidden>
+            <div class="modal-content">
+                <h2>تصدير الملف</h2>
+                <div class="export-options">
+                    <button id="export-txt" class="export-btn">
+                        <span class="icon-file-text"></span>
+                        <span>Text (.txt)</span>
+                    </button>
+                    <button id="export-md" class="export-btn">
+                        <span class="icon-markdown"></span>
+                        <span>Markdown (.md)</span>
+                    </button>
+                </div>
+                <div class="modal-actions">
+                    <button id="cancel-export" class="btn secondary">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- File/Folder Name Modal -->
+        <div id="name-modal" class="modal name-modal" hidden>
+            <div class="modal-content">
+                <h2 id="name-modal-title">ملف جديد</h2>
+                <div class="input-group">
+                    <label for="item-name-input">الاسم:</label>
+                    <input type="text" id="item-name-input" class="text-input" placeholder="أدخل الاسم...">
+                </div>
+                <div class="modal-actions">
+                    <button id="cancel-name" class="btn secondary">إلغاء</button>
+                    <button id="confirm-name" class="btn primary">إنشاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay (for off-canvas sidebar) -->
+    <div id="mobile-overlay" class="mobile-overlay"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JavaScript Entry Point -->
+    <script type="module" src="src/main.js"></script>
+
+    <!-- Fallback: Inline mobile menu handler (works when file:// blocks ES modules) -->
+    <script>
+        // This script runs regardless of module loading status
+        // It provides basic hamburger menu functionality as a fallback
+        document.addEventListener('DOMContentLoaded', function () {
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var sidebar = document.getElementById('sidebar');
+            var mobileOverlay = document.getElementById('mobile-overlay');
+
+            if (!hamburgerBtn || !sidebar || !mobileOverlay) {
+                console.warn('Mobile fallback: Elements not found');
+                return;
+            }
+
+            function toggleSidebar() {
+                var isOpen = sidebar.classList.contains('mobile-open');
+                if (isOpen) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    sidebar.classList.add('mobile-open');
+                    mobileOverlay.classList.add('active');
+                    hamburgerBtn.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            // Support both click and touch for hamburger
+            function onHamburgerActivate(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                toggleSidebar();
+            }
+            hamburgerBtn.addEventListener('click', onHamburgerActivate);
+            hamburgerBtn.addEventListener('touchend', onHamburgerActivate);
+
+            // Sidebar toggle button (chevron in sidebar header)
+            var toggleSidebarBtn = document.getElementById('toggle-sidebar');
+            var expandSidebarBtn = document.getElementById('expand-sidebar-btn');
+
+            // Only add handler if not already attached by module
+            if (toggleSidebarBtn && !toggleSidebarBtn.dataset.sidebarHandlerAttached) {
+                function onToggleSidebarActivate(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    // On mobile, close the sidebar
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                        mobileOverlay.classList.remove('active');
+                        hamburgerBtn.classList.remove('active');
+                        document.body.style.overflow = '';
+                    } else {
+                        // On desktop, toggle collapsed state
+                        sidebar.classList.toggle('collapsed');
+                        var isCollapsed = sidebar.classList.contains('collapsed');
+                        // Show/hide expand button
+                        if (expandSidebarBtn) {
+                            expandSidebarBtn.classList.toggle('visible', isCollapsed);
+                        }
+                    }
+                }
+                toggleSidebarBtn.addEventListener('click', onToggleSidebarActivate);
+                toggleSidebarBtn.addEventListener('touchend', onToggleSidebarActivate);
+                toggleSidebarBtn.dataset.sidebarHandlerAttached = 'true';
+            }
+
+            // Expand sidebar button (shows when collapsed)
+            if (expandSidebarBtn && !expandSidebarBtn.dataset.sidebarHandlerAttached) {
+                function onExpandSidebar(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    sidebar.classList.remove('collapsed');
+                    expandSidebarBtn.classList.remove('visible');
+                }
+                expandSidebarBtn.addEventListener('click', onExpandSidebar);
+                expandSidebarBtn.dataset.sidebarHandlerAttached = 'true';
+            }
+
+            mobileOverlay.addEventListener('click', function () {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close on escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Guard: Skip if mobile.js module already initialized (but DON'T return - handle what module missed)
+            var moduleInitialized = window.__mobileModuleInitialized;
+            window.__mobileFallbackInitialized = true;
+
+            // Mobile AI Menu Logic
+            var aiFab = document.getElementById('ai-fab');
+            var aiBottomSheet = document.getElementById('ai-bottom-sheet');
+            var closeAiSheetBtn = document.getElementById('close-ai-sheet');
+            // FIXED: Scope button selection to only AI sheet
+            var aiSheetBtns = aiBottomSheet ? aiBottomSheet.querySelectorAll('.ai-sheet-btn') : [];
+
+            // More Options Sheet Logic
+            var moreBtn = document.getElementById('mobile-more-btn');
+            var moreOptionsSheet = document.getElementById('more-options-sheet');
+            var closeMoreSheet = document.getElementById('close-more-sheet');
+            var moreSheetBtns = moreOptionsSheet ? moreOptionsSheet.querySelectorAll('.ai-sheet-btn') : [];
+
+            // Helper to close all sheets
+            function closeAllSheets() {
+                if (aiBottomSheet) aiBottomSheet.classList.remove('active');
+                if (moreOptionsSheet) moreOptionsSheet.classList.remove('active');
+            }
+
+            // Helper to check if any sheet is open
+            function isAnySheetOpen() {
+                return (aiBottomSheet && aiBottomSheet.classList.contains('active')) ||
+                    (moreOptionsSheet && moreOptionsSheet.classList.contains('active'));
+            }
+
+            // AI Sheet toggle
+            function toggleAiSheet() {
+                var isOpen = aiBottomSheet && aiBottomSheet.classList.contains('active');
+                if (isOpen) {
+                    aiBottomSheet.classList.remove('active');
+                    if (!sidebar.classList.contains('mobile-open')) {
+                        mobileOverlay.classList.remove('active');
+                    }
+                } else {
+                    // Close other sheets first
+                    if (moreOptionsSheet) moreOptionsSheet.classList.remove('active');
+                    if (sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                        hamburgerBtn.classList.remove('active');
+                    }
+                    aiBottomSheet.classList.add('active');
+                    mobileOverlay.classList.add('active');
+                }
+            }
+
+            // More Options Sheet toggle
+            function toggleMoreSheet() {
+                var isOpen = moreOptionsSheet && moreOptionsSheet.classList.contains('active');
+                if (isOpen) {
+                    moreOptionsSheet.classList.remove('active');
+                    if (!sidebar.classList.contains('mobile-open')) {
+                        mobileOverlay.classList.remove('active');
+                    }
+                } else {
+                    // Close other sheets first
+                    if (aiBottomSheet) aiBottomSheet.classList.remove('active');
+                    if (sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                        hamburgerBtn.classList.remove('active');
+                    }
+                    moreOptionsSheet.classList.add('active');
+                    mobileOverlay.classList.add('active');
+                }
+            }
+
+            // Helper: Only add handler if not already added (check data attribute)
+            function addHandlerOnce(element, eventType, handler) {
+                if (element && !element.dataset.handlerAttached) {
+                    element.addEventListener(eventType, handler);
+                    element.dataset.handlerAttached = 'true';
+                }
+            }
+
+            // AI FAB click (skip if module already handled)
+            if (!moduleInitialized) {
+                addHandlerOnce(aiFab, 'click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    toggleAiSheet();
+                });
+            }
+
+            // Close AI Sheet button - ALWAYS add if not present
+            // Use both click and touchend for better mobile responsiveness
+            if (closeAiSheetBtn && !closeAiSheetBtn.dataset.handlerAttached) {
+                function closeAiSheet(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (aiBottomSheet) {
+                        aiBottomSheet.classList.remove('active');
+                    }
+                    // Always remove overlay if no other elements need it
+                    var sidebarOpen = sidebar && sidebar.classList.contains('mobile-open');
+                    var moreSheetOpen = moreOptionsSheet && moreOptionsSheet.classList.contains('active');
+                    if (!sidebarOpen && !moreSheetOpen) {
+                        mobileOverlay.classList.remove('active');
+                    }
+                }
+                closeAiSheetBtn.addEventListener('click', closeAiSheet);
+                closeAiSheetBtn.addEventListener('touchend', closeAiSheet);
+                closeAiSheetBtn.dataset.handlerAttached = 'true';
+            }
+
+            // AI Sheet button delegation
+            aiSheetBtns.forEach(function (btn) {
+                addHandlerOnce(btn, 'click', function (e) {
+                    e.stopPropagation();
+                    var targetId = btn.getAttribute('data-trigger');
+                    var originalBtn = document.getElementById(targetId);
+                    if (originalBtn) {
+                        originalBtn.click();
+                    }
+                    // Close sheet
+                    aiBottomSheet.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                });
+            });
+
+            // More Options button - ALWAYS add if not present
+            addHandlerOnce(moreBtn, 'click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                toggleMoreSheet();
+            });
+
+            // Close More Sheet button - ALWAYS add if not present  
+            // Use both click and touchend for better mobile responsiveness
+            if (closeMoreSheet && !closeMoreSheet.dataset.handlerAttached) {
+                function closeMoreSheetHandler(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (moreOptionsSheet) {
+                        moreOptionsSheet.classList.remove('active');
+                    }
+                    // Always remove overlay if no other elements need it
+                    var sidebarOpen = sidebar && sidebar.classList.contains('mobile-open');
+                    var aiSheetOpen = aiBottomSheet && aiBottomSheet.classList.contains('active');
+                    if (!sidebarOpen && !aiSheetOpen) {
+                        mobileOverlay.classList.remove('active');
+                    }
+                }
+                closeMoreSheet.addEventListener('click', closeMoreSheetHandler);
+                closeMoreSheet.addEventListener('touchend', closeMoreSheetHandler);
+                closeMoreSheet.dataset.handlerAttached = 'true';
+            }
+
+            // More Sheet button delegation
+            moreSheetBtns.forEach(function (btn) {
+                addHandlerOnce(btn, 'click', function (e) {
+                    e.stopPropagation();
+                    var targetId = btn.getAttribute('data-trigger');
+                    var originalBtn = document.getElementById(targetId);
+                    if (originalBtn) {
+                        originalBtn.click();
+                    }
+                    // Close sheet
+                    moreOptionsSheet.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                });
+            });
+
+            // Close Search button handler (fallback for when modals.js doesn't load)
+            var closeSearchBtn = document.getElementById('close-search');
+            var modalOverlay = document.getElementById('modal-overlay');
+            var searchModal = document.getElementById('search-modal');
+
+            if (closeSearchBtn && !closeSearchBtn.dataset.handlerAttached) {
+                function closeSearchHandler(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    // Close search modal
+                    if (modalOverlay) {
+                        modalOverlay.classList.remove('active');
+                        modalOverlay.hidden = true;
+                    }
+                    if (searchModal) {
+                        searchModal.hidden = true;
+                    }
+                }
+                closeSearchBtn.addEventListener('click', closeSearchHandler);
+                closeSearchBtn.addEventListener('touchend', closeSearchHandler);
+                closeSearchBtn.dataset.handlerAttached = 'true';
+            }
+
+            // CONSOLIDATED: Single overlay click handler for all sheets
+            mobileOverlay.addEventListener('click', function (e) {
+                // Don't close if clicking on a sheet itself
+                if (e.target === mobileOverlay) {
+                    closeAllSheets();
+                    sidebar.classList.remove('mobile-open');
+                    hamburgerBtn.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Delegate clicks from bottom bar buttons to original toolbar buttons
+            var bottomBarBtns = document.querySelectorAll('.bottom-bar-btn[data-trigger]');
+            bottomBarBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var targetId = btn.getAttribute('data-trigger');
+                    var originalBtn = document.getElementById(targetId);
+                    if (originalBtn) {
+                        originalBtn.click();
+                    }
+                });
+            });
+
+            // Sync mobile status info with desktop values
+            var currentFile = document.getElementById('current-file');
+            var wordCount = document.getElementById('word-count');
+            var mobileCurrentFile = document.getElementById('mobile-current-file');
+            var mobileWordCount = document.getElementById('mobile-word-count');
+
+            if (currentFile && mobileCurrentFile) {
+                // Initial sync
+                mobileCurrentFile.textContent = currentFile.textContent;
+                // Observe changes
+                var observer = new MutationObserver(function () {
+                    mobileCurrentFile.textContent = currentFile.textContent;
+                });
+                observer.observe(currentFile, { childList: true, characterData: true, subtree: true });
+            }
+
+            if (wordCount && mobileWordCount) {
+                // Initial sync
+                mobileWordCount.textContent = wordCount.textContent;
+                // Observe changes
+                var observer2 = new MutationObserver(function () {
+                    mobileWordCount.textContent = wordCount.textContent;
+                });
+                observer2.observe(wordCount, { childList: true, characterData: true, subtree: true });
+            }
+
+            console.log('Mobile fallback script initialized');
+        });
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register Service Worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function (registration) {
+                        console.log('ServiceWorker registered successfully:', registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>

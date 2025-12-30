@@ -1,0 +1,823 @@
+/* ============================================
+   TextAIpro - Mobile Responsive Styles
+   ============================================
+   Touch-first design with off-canvas navigation,
+   responsive toolbar, and mobile-optimized modals
+   ============================================ */
+
+/* ======= Mobile Variables ======= */
+:root {
+    --mobile-sidebar-width: 280px;
+    --mobile-touch-target: 44px;
+    --mobile-toolbar-height: 60px;
+}
+
+/* ======= Mobile Overlay ======= */
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: calc(var(--z-sticky) - 1);
+}
+
+.mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ======= Hamburger Menu Button ======= */
+.hamburger-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--mobile-touch-target);
+    height: var(--mobile-touch-target);
+    padding: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    /* Ensure button is clickable and above other elements */
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.hamburger-btn:hover,
+.hamburger-btn:focus {
+    background: var(--bg-hover);
+    border-color: var(--accent-muted);
+}
+
+.hamburger-btn:active {
+    transform: scale(0.95);
+}
+
+/* Hamburger Icon */
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 20px;
+    height: 20px;
+}
+
+.hamburger-icon span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-secondary);
+    border-radius: 1px;
+    transition: all var(--transition-fast);
+}
+
+.hamburger-btn:hover .hamburger-icon span {
+    background: var(--text-primary);
+}
+
+/* Hamburger Animation when sidebar is open */
+.hamburger-btn.active .hamburger-icon span:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* ======= Mobile Status Info ======= */
+.mobile-status-info {
+    display: none;
+    /* Hidden on desktop, shown on mobile via media query */
+}
+
+/* ======= Mobile Bottom Navigation Bar ======= */
+.mobile-bottom-bar {
+    display: none;
+    /* Hidden by default, shown on mobile */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-base);
+    border-top: 1px solid var(--glass-border);
+    z-index: var(--z-sticky);
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 var(--space-2);
+    /* Safe area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Bottom Bar Buttons */
+.bottom-bar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.bottom-bar-btn:hover,
+.bottom-bar-btn:focus {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.bottom-bar-btn:active {
+    transform: scale(0.95);
+}
+
+.bottom-bar-btn [class^="icon-"]::before {
+    font-size: 22px;
+}
+
+/* Central AI Button - Premium Design */
+.ai-center-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+    border: 2px solid var(--accent-primary);
+    border-radius: 14px;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+}
+
+.ai-center-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(212, 175, 55, 0.35);
+    border-color: var(--accent-light);
+}
+
+.ai-center-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Refined AI Icon - Diamond/Gem inspired */
+.icon-ai-refined {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-ai-refined::before,
+.icon-ai-refined::after {
+    content: '';
+    position: absolute;
+    background: var(--accent-primary);
+}
+
+/* Diamond shape using rotated square */
+.icon-ai-refined::before {
+    width: 14px;
+    height: 14px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-primary) 50%, var(--accent-dark) 100%);
+}
+
+/* Inner highlight for depth */
+.icon-ai-refined::after {
+    width: 6px;
+    height: 6px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 1px;
+}
+
+/* More Options Icon (three dots) */
+.icon-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-more::before,
+.icon-more::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+/* Middle dot using box-shadow trick */
+.icon-more::before {
+    box-shadow: 8px 0 0 currentColor;
+}
+
+/* ======= AI Bottom Sheet ======= */
+.ai-bottom-sheet {
+    position: fixed;
+    bottom: 64px;
+    /* Sits above the bottom bar */
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--space-4);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0));
+    z-index: calc(var(--z-sticky) + 1);
+    /* Above bottom bar but below modal */
+    transform: translateY(calc(100% + 64px));
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    visibility: hidden;
+}
+
+.ai-bottom-sheet.active {
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.ai-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.ai-sheet-header h3 {
+    font-size: var(--text-lg);
+    color: var(--accent-primary);
+}
+
+.ai-sheet-content {
+    display: grid;
+    gap: var(--space-3);
+    /* Grid layout for buttons */
+    grid-template-columns: 1fr;
+}
+
+.ai-sheet-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 100%;
+}
+
+.ai-sheet-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-muted);
+}
+
+/* ======= Tablet Breakpoint (768px and below) ======= */
+@media screen and (max-width: 768px) {
+
+    /* Hide elements marked for mobile hiding */
+    .mobile-hide {
+        display: none !important;
+    }
+
+    /* Hide desktop expand button on mobile (uses hamburger instead) */
+    .expand-sidebar-btn {
+        display: none !important;
+    }
+
+    /* Show hamburger button */
+    .hamburger-btn {
+        display: flex;
+    }
+
+    /* Show Mobile Bottom Navigation Bar */
+    .mobile-bottom-bar {
+        display: flex;
+    }
+
+    /* Show mobile status info */
+    .mobile-status-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex: 1;
+        min-width: 0;
+        /* Allow text truncation */
+        margin-inline-end: auto;
+    }
+
+    .mobile-file-name {
+        font-size: var(--text-sm);
+        color: var(--text-primary);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    .mobile-word-count {
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* Hide desktop status bar on mobile */
+    .status-bar {
+        display: none;
+    }
+
+    /* Hide AI tools in toolbar */
+    .toolbar-group.ai-tools {
+        display: none;
+    }
+
+    /* Destructive option styling */
+    .destructive-option {
+        color: var(--error) !important;
+    }
+
+    .destructive-option .icon-trash::before,
+    .destructive-option .icon-trash::after {
+        background: var(--error);
+    }
+
+    /* Off-canvas Sidebar */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: var(--mobile-sidebar-width);
+        transform: translateX(100%);
+        transition: transform var(--transition-base);
+        z-index: var(--z-overlay);
+        box-shadow: var(--shadow-xl);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Limit file tree height to ensure drop zone visibility */
+    .file-tree {
+        flex: 1;
+        min-height: 0;
+        /* Allow shrinking */
+        max-height: calc(100vh - 300px);
+        /* Reserve space for header, actions, and drop zone */
+        overflow-y: auto;
+    }
+
+    [dir="rtl"] .sidebar {
+        right: 0;
+        left: auto;
+        transform: translateX(100%);
+    }
+
+    [dir="ltr"] .sidebar {
+        left: 0;
+        right: auto;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* Main content takes full width */
+    .main-content {
+        width: 100%;
+        margin: 0;
+        /* Account for mobile bottom bar height (64px) + safe area for notched phones */
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Editor container fills available space without overlap */
+    .editor-container {
+        /* Ensure content doesn't get hidden behind bottom bar */
+        max-height: calc(100vh - var(--mobile-toolbar-height, 60px) - 64px - env(safe-area-inset-bottom, 0px));
+        overflow-y: auto;
+    }
+
+    /* Responsive Toolbar */
+    .toolbar {
+        flex-wrap: nowrap;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        min-height: var(--mobile-toolbar-height);
+    }
+
+    .toolbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .toolbar-group {
+        flex-shrink: 0;
+    }
+
+    /* Touch-friendly buttons */
+    .tool-btn {
+        min-width: var(--mobile-touch-target);
+        min-height: var(--mobile-touch-target);
+        padding: var(--space-2);
+    }
+
+    .icon-btn {
+        min-width: var(--mobile-touch-target);
+        min-height: var(--mobile-touch-target);
+    }
+
+    /* Hide button labels on tablet to save space */
+    .tool-btn .btn-label {
+        display: none;
+    }
+
+    /* Larger dividers for touch */
+    .divider {
+        margin: 0 var(--space-1);
+    }
+
+    /* Editor adjustments */
+    .editor {
+        padding: var(--space-4);
+        /* Add extra padding at bottom so text ends above the bottom bar */
+        padding-bottom: calc(var(--space-4) + 80px + env(safe-area-inset-bottom, 0px));
+        font-size: var(--text-base);
+    }
+
+    /* Status bar adjustments */
+    .status-bar {
+        padding: var(--space-2) var(--space-3);
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    /* Modal adjustments */
+    .modal {
+        width: 95%;
+        max-width: none;
+        margin: var(--space-4);
+    }
+
+    .modal-content {
+        padding: var(--space-4);
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+        min-height: var(--mobile-touch-target);
+    }
+
+    /* Export options stack vertically */
+    .export-options {
+        flex-direction: column;
+    }
+
+    .export-btn {
+        padding: var(--space-4);
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    /* Search modal adjustments */
+    .search-actions {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .search-actions .btn {
+        width: 100%;
+        min-height: var(--mobile-touch-target);
+    }
+
+    #match-count {
+        text-align: center;
+        margin-bottom: var(--space-2);
+    }
+
+    /* File tree items touch-friendly */
+    .file-tree-item {
+        min-height: var(--mobile-touch-target);
+        padding: var(--space-3);
+    }
+
+    /* Action buttons touch-friendly */
+    .action-btn {
+        min-height: var(--mobile-touch-target);
+        padding: var(--space-3);
+    }
+
+    /* Sidebar header adjustments */
+    .sidebar-header {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    /* Close button in sidebar header */
+    #toggle-sidebar {
+        min-width: var(--mobile-touch-target);
+        min-height: var(--mobile-touch-target);
+    }
+
+    /* Drop zone adjustments - larger touch target for mobile */
+    .drop-zone {
+        padding: var(--space-6);
+        margin: var(--space-3);
+        min-height: 140px;
+        max-height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        /* Prevent shrinking when sidebar content is tight */
+    }
+
+    .drop-zone:active {
+        background: var(--accent-glow);
+        border-color: var(--accent-primary);
+    }
+
+    /* Select input touch-friendly */
+    .select-input {
+        min-height: var(--mobile-touch-target);
+        padding: var(--space-2) var(--space-4);
+    }
+
+    /* Text input touch-friendly */
+    .text-input {
+        min-height: var(--mobile-touch-target);
+        padding: var(--space-3);
+        font-size: 16px;
+        /* Prevents iOS zoom on focus */
+    }
+
+    /* Toast positioning */
+    .toast-container {
+        left: var(--space-4);
+        right: var(--space-4);
+        transform: none;
+        bottom: var(--space-4);
+    }
+
+    .toast {
+        width: 100%;
+    }
+}
+
+/* ======= Mobile Breakpoint (480px and below) ======= */
+@media screen and (max-width: 480px) {
+
+    /* Smaller sidebar on phones */
+    .sidebar {
+        width: 100%;
+        max-width: var(--mobile-sidebar-width);
+    }
+
+    /* Toolbar more compact */
+    .toolbar {
+        padding: var(--space-2);
+        gap: var(--space-1);
+    }
+
+    /* Smaller tool buttons but still touch-friendly */
+    .tool-btn {
+        padding: var(--space-1);
+    }
+
+    /* Dividers hidden on mobile phone */
+    .divider {
+        display: none;
+    }
+
+    /* Editor full width with minimal padding */
+    .editor {
+        padding: var(--space-3);
+    }
+
+    /* Line numbers hidden by default on mobile */
+    .line-numbers {
+        display: none;
+    }
+
+    /* File info hidden on very small screens */
+    #save-status {
+        display: none;
+    }
+
+    /* Modal becomes almost full screen */
+    .modal {
+        width: 100%;
+        max-height: 90vh;
+        margin: 0;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .modal-overlay.active .modal:not([hidden]) {
+        transform: translateY(0);
+        animation: slideUpModal 0.3s ease;
+    }
+
+    @keyframes slideUpModal {
+        from {
+            transform: translateY(100%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Logo smaller */
+    .logo {
+        font-size: var(--text-lg);
+    }
+
+    /* Search results scrollable */
+    .search-results {
+        max-height: 150px;
+    }
+
+    /* Input groups stack */
+    .input-group label {
+        font-size: var(--text-xs);
+    }
+}
+
+/* ======= Landscape Phone Adjustments ======= */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+
+    /* Toolbar stays compact */
+    .toolbar {
+        min-height: 48px;
+    }
+
+    /* Modal max height reduced */
+    .modal {
+        max-height: 85vh;
+    }
+
+    /* Editor takes more space */
+    .editor {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    /* Sidebar narrower */
+    .sidebar {
+        width: 240px;
+    }
+}
+
+/* ======= Touch Device Optimizations ======= */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Remove hover effects that don't work on touch */
+    .file-tree-item:hover {
+        transform: none;
+    }
+
+    .export-btn:hover {
+        transform: none;
+    }
+
+    /* Show item actions always on touch devices */
+    .item-actions {
+        display: flex;
+        opacity: 0.7;
+    }
+
+    /* Larger touch areas for file actions */
+    .item-action-btn {
+        padding: var(--space-2);
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    /* Better tap feedback */
+    .btn:active,
+    .tool-btn:active,
+    .action-btn:active,
+    .file-tree-item:active {
+        background: var(--bg-hover);
+        transform: scale(0.98);
+    }
+
+    /* Disable backdrop blur on lower-end devices for performance */
+    @supports not (backdrop-filter: blur(16px)) {
+        .glass {
+            background: var(--bg-base);
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+        }
+    }
+}
+
+/* ======= Reduced Motion Preference ======= */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar {
+        transition: none;
+    }
+
+    .mobile-overlay {
+        transition: none;
+    }
+
+    .modal {
+        transition: none;
+        animation: none;
+    }
+
+    .ai-bottom-sheet {
+        transition: none;
+    }
+
+    .hamburger-icon span {
+        transition: none;
+    }
+
+    .ai-fab {
+        transition: none;
+    }
+}
+
+/* ======= High Contrast Mode ======= */
+@media (prefers-contrast: high) {
+    .hamburger-btn {
+        border-width: 2px;
+    }
+
+    .tool-btn {
+        border: 1px solid var(--glass-border);
+    }
+
+    .ai-fab {
+        border: 2px solid white;
+    }
+}
+
+/* ======= Print Styles ======= */
+@media print {
+
+    .sidebar,
+    .toolbar,
+    .status-bar,
+    .hamburger-btn,
+    .mobile-overlay,
+    .ai-fab,
+    .ai-bottom-sheet {
+        display: none !important;
+    }
+
+    .main-content {
+        width: 100% !important;
+    }
+
+    .editor {
+        padding: 0;
+        overflow: visible;
+    }
+}
