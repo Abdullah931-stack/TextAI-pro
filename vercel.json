@@ -1,47 +1,11 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "api/**/*.js",
-            "use": "@vercel/node"
-        },
-        {
-            "src": "index.html",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "manifest.json",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "sw.js",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "src/**/*",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "icons/**/*",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "icon.png",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/$1"
-        }
-    ],
-    "env": {
-        "GEMINI_MODEL": "gemini-3-flash-preview",
-        "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/models"
-    }
+  "version": 2,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" },
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
+  "env": {
+      "GEMINI_MODEL": "gemini-3-flash-preview",
+      "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/models"
+  }
 }
